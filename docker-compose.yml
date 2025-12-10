@@ -1,0 +1,43 @@
+version: "3.8"
+
+services:
+  sdow:
+    # Make sure to replace 'jwngr' with your GitHub username if you fork the repository
+    image: ghcr.io/jwngr/sdow:latest
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      # Volume for the databases.
+      # The Docker image creates mock databases for testing. For production, you should
+      # provide your own sdow.sqlite and searches.sqlite files.
+      # Place them in a 'data/sdow' directory on your host machine, next to this docker-compose.yml file.
+      # The 'sdow' subfolder is required because the application expects 'sdow/sdow.sqlite'.
+      - ./data/sdow:/app/sdow
+
+      # Volumes for Let's Encrypt SSL certificates.
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
+
+# How to set up SSL:
+# The nginx configuration included in the Docker image is set up for SSL and to handle
+# the Let's Encrypt ACME challenge.
+#
+# 1. Before you start, you may need to edit 'config/nginx.conf' to replace
+#    'api.sixdegreesofwikipedia.com' with your domain if it's different.
+#    Then, the Docker image needs to be rebuilt and pushed.
+#
+# 2. Start the service:
+#    docker-compose up -d
+#
+# 3. Run Certbot to obtain the certificate. Replace the domain and email with your own.
+#    docker-compose exec sdow certbot certonly --webroot --webroot-path /var/www/certbot -d api.sixdegreesofwikipedia.com --email wenger.jacob@gmail.com --agree-tos --no-eff-email --non-interactive
+#
+# 4. Once certbot succeeds, restart nginx inside the container for the new certificate to be loaded.
+#    docker-compose exec sdow supervisorctl restart nginx
+#
+#    Or, you can just restart the whole container:
+#    docker-compose restart
+#
+# Your SSL certificate will be automatically renewed.
