@@ -2,8 +2,7 @@ version: "3.8"
 
 services:
   sdow:
-    # Make sure to replace 'jwngr' with your GitHub username if you fork the repository
-    image: ghcr.io/jwngr/sdow:latest
+    image: ghcr.io/willtheorangeguy/sdow-docker:latest
     restart: always
     ports:
       - "80:80"
